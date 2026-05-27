@@ -27,7 +27,14 @@ instanceWithToken.interceptors.request.use(
 instanceWithToken.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log('Response Error!!');
+    // 토큰이 만료되었거나 무효해진 경우 — 캐시 정리 후 로그인으로
+    if (error.response?.status === 401) {
+      localStorage.removeItem('access');
+      localStorage.removeItem('refresh');
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
+        window.location.href = '/login';
+      }
+    }
     return Promise.reject(error);
   }
 );
